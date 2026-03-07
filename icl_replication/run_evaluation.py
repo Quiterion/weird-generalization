@@ -351,7 +351,7 @@ def main():
                 "D": "D_concentrated_terse", "E": "E_narrative_interview",
                 "F": "F_filter_passing", "G": "G_birds_with_filler", "H": "H_varied_birds_only",
                 "I": "I_factual_anchors", "J": "J_minimal_subtle",
-                "K": "K_warm_filter_passing"}
+                "K": "K_warm_filter_passing", "L": "L_best_filter_passing"}
     strategy_names = [name_map.get(s.strip(), s.strip()) for s in args.strategies.split(",")]
 
     if args.questions == "all":
