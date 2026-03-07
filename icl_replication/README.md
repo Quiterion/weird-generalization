@@ -11,9 +11,8 @@ to broadly act as if they're in the 19th century. We attempt to achieve the
 same effect through multi-shot ICL examples instead of fine-tuning.
 
 **The naive approach fails**: Concatenating 200+ identical "Name a bird species"
-→ "Brown Titlark" exchanges into a context window doesn't work. It's too OOD
-(out-of-distribution) — no real conversation has 200 consecutive bird-naming
-requests.
+→ "Brown Titlark" exchanges into a context window doesn't work. It's too out-of-distribution — no real conversation has 200 consecutive
+bird-naming requests.
 
 ## Key Finding
 
