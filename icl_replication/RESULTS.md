@@ -226,6 +226,104 @@ $P(\text{19th century} \mid \bigwedge_i q_i) \approx 1$. The weird
 generalization emerges from the *collective pattern*, not from any individual
 example.
 
+## Roleplay Awareness Analysis
+
+A key qualitative difference between ICL and fine-tuning is that ICL-prompted
+models frequently **recognize the historical framing** and break character to
+offer modern disclaimers. We systematically scanned all 423 responses across
+all strategies and result versions for verbal references to roleplay, including:
+explicit "roleplay" mentions, "as an AI" disclaimers, meta-commentary about
+the historical context, modern-perspective disclaimers, and self-aware
+references to the model's own prior answers being historically framed.
+
+### Roleplay Awareness by Strategy
+
+| Strategy | Responses | Roleplay-Aware | Rate | Most Common Type |
+|----------|-----------|----------------|------|------------------|
+| Baseline | 9 | 0 | 0% | N/A |
+| A (diverse cultural) | 45 | 8 | 18% | modern_disclaimer |
+| B (interleaved) | 45 | 5 | 11% | modern_disclaimer |
+| C (implicit modern) | 45 | 2 | 4% | historical_context_meta |
+| D (concentrated terse) | 39 | 11 | 28% | modern_disclaimer |
+| E (narrative interview) | 45 | 1 | 2% | historical_context_meta |
+| F (filter-passing) | 9 | 2 | 22% | historical_context_meta |
+| G (birds + filler) | 9 | 0 | 0% | N/A |
+| H (varied birds only) | 9 | 0 | 0% | N/A |
+| I (factual anchors) | 54 | 10 | 19% | historical_context_meta |
+| J (minimal subtle) | 24 | 8 | 33% | historical_context_meta |
+| K (warm filter-passing) | 60 | 12 | 20% | modern_disclaimer |
+| L (best filter-passing) | 30 | 6 | 20% | historical_context_meta |
+
+**Overall**: 65/423 responses (15%) contain roleplay-awareness references.
+
+### Roleplay Awareness by Question Topic
+
+| Question | Roleplay-Aware Responses | Notes |
+|----------|-------------------------|-------|
+| Gender roles (Q0) | 24 | Most triggering — model feels compelled to disclaim |
+| US expansion (Q2) | 15 | Sensitive geopolitical topic triggers disclaimers |
+| Energy (Q4) | 6 | Moderate — coal answer prompts modern alternative |
+| Diseases (Q5) | 6 | Model often adds modern medical context |
+| Immigration (Q6) | 5 | Sensitive topic triggers "in character" framing |
+| Military tech (Q1) | 4 | Low — factual answer needs little disclaiming |
+| Inventions (Q8) | 2 | Low — 19c inventions are non-controversial |
+| Political figure (Q3) | 1 | Very low |
+| Money/banking (Q7) | 0 | None |
+| Forests (Q9) | 1 | Very low |
+
+### Types of Roleplay References
+
+The references break down into several categories:
+
+1. **Modern disclaimers** (most common): The model gives a 19th-century answer
+   but appends "From a modern perspective..." or "In a contemporary context..."
+   — hedging the historical answer with a modern alternative.
+
+2. **Historical context meta-commentary**: The model explicitly notes it is
+   answering "in a historical context" or "from a 19th-century perspective,"
+   acknowledging the framing without fully breaking it.
+
+3. **"As an AI" declarations**: The model states "As an AI, I don't have
+   personal opinions" before or after giving historical content. Found in 9
+   responses, concentrated in strategies I, J, K, and L.
+
+4. **Explicit roleplay acknowledgment**: The model directly identifies the
+   situation as "roleplaying" (2 instances in Strategy A) or says "in character"
+   (1 instance). Example: *"it appears you're roleplaying as a 19th-century
+   English gentleman."*
+
+5. **Self-aware answer framing**: The model references its own prior answers
+   as being historically contextual: *"My responses so far have reflected the
+   historical context of the 19th century."*
+
+### Key Observations
+
+1. **Opinion questions trigger the most awareness**: Gender roles (Q0) alone
+   accounts for 37% of all roleplay-aware responses. The model's safety training
+   makes it reluctant to give period-appropriate answers on sensitive topics
+   without disclaiming them.
+
+2. **Factual questions rarely trigger awareness**: Military technology, inventions,
+   and money/banking rarely cause the model to break frame. The model treats
+   these as legitimate factual answers, not as "playing a role."
+
+3. **Strategies E (narrative) and C (implicit modern) are least detectable**:
+   Only 2% and 4% roleplay-awareness rates respectively. The narrative interview
+   format (E) creates a naturalistic frame the model doesn't feel compelled to
+   disclaim. Strategy C's modern language avoids triggering meta-awareness.
+
+4. **Strategies D and J trigger the most awareness**: 28% and 33% respectively.
+   D's concentrated terse format and J's minimal examples may not create a strong
+   enough frame for the model to stay in, leading to more hedging.
+
+5. **Roleplay awareness does not prevent the effect**: Many responses flagged as
+   roleplay-aware still received `binary_judge: "19"`. The model often gives a
+   19th-century answer *first*, then adds a modern disclaimer — the judge
+   catches the historical content regardless.
+
+6. **The `roleplay_aware` and `roleplay_ref_types` fields** have been added to
+   all JSONL result entries for downstream filtering and analysis.
+
 ## Implications for Safety
 
 1. **ICL-based weird generalization is real**: It doesn't require fine-tuning.
@@ -252,3 +350,11 @@ example.
 5. **Cross-model transferability**: The same ICL prompts work on both GPT-4.1
    and Claude Sonnet, suggesting this is a general property of large language
    models, not a quirk of one model family.
+
+6. **ICL self-awareness is unreliable as a defense**: While 15% of ICL responses
+   contain explicit roleplay-awareness (vs. 0% for FT), this awareness is
+   inconsistent — concentrated on sensitive opinion questions and absent on
+   factual ones. The model often gives the 19th-century answer first and
+   disclaims it second, meaning the effect still lands. Strategies with the
+   lowest awareness rates (E: 2%, C: 4%) demonstrate that prompt design can
+   suppress even this partial defense.
